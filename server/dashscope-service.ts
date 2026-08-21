@@ -22,13 +22,16 @@ interface DashScopeResponse {
 }
 
 const DASHSCOPE_API_URL = "https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/text-generation/generation";
-const API_KEY = process.env.DASHSCOPE_API_KEY;
-
-if (!API_KEY) {
-  throw new Error("DASHSCOPE_API_KEY environment variable is not set");
+function requireApiKey(): string {
+  const apiKey = process.env.DASHSCOPE_API_KEY?.trim();
+  if (!apiKey) {
+    throw new Error("DASHSCOPE_API_KEY environment variable is not set");
+  }
+  return apiKey;
 }
 
 export async function callQwenModel(messages: Message[]): Promise<string> {
+  const apiKey = requireApiKey();
   try {
     const response = await axios.post<DashScopeResponse>(
       DASHSCOPE_API_URL,
@@ -39,7 +42,7 @@ export async function callQwenModel(messages: Message[]): Promise<string> {
       },
       {
         headers: {
-          Authorization: `Bearer ${API_KEY}`,
+          Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
       }
